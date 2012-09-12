@@ -1,4 +1,4 @@
-#include "com_purplefrog_speexjni_SpeexEncoder.h"
+#include "com_purplefrog_speexjni_SpeexDecoder.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -17,8 +17,8 @@ static struct SlotVector slots = {
 //
 //
 
-JNIEXPORT jint JNICALL Java_com_purplefrog_speexjni_SpeexEncoder_allocate
-  (JNIEnv *env, jclass cls, jboolean wideband, jint quality)
+JNIEXPORT jint JNICALL Java_com_purplefrog_speexjni_SpeexDecoder_allocate
+  (JNIEnv *env, jclass cls, jboolean wideband)
 {
     int slot = allocate_slot(&slots);
 
@@ -32,9 +32,7 @@ JNIEXPORT jint JNICALL Java_com_purplefrog_speexjni_SpeexEncoder_allocate
 
     speex_bits_init(&gob->bits);
 
-    gob->state = speex_encoder_init(wideband ? &speex_wb_mode : &speex_nb_mode);
-
-    speex_encoder_ctl(gob->state, SPEEX_SET_QUALITY, &quality);
+    gob->state = speex_decoder_init(wideband ? &speex_wb_mode : &speex_nb_mode);
 
     return slot;
 }
@@ -79,14 +77,14 @@ static int throwIfBadSlot(JNIEnv *env, jint slot)
 
 //
 
-JNIEXPORT void JNICALL Java_com_purplefrog_speexjni_SpeexEncoder_deallocate
+JNIEXPORT void JNICALL Java_com_purplefrog_speexjni_SpeexDecoder_deallocate
   (JNIEnv *env, jclass cls, jint slot)
 {
     if (throwIfBadSlot(env, slot))
 	return;
 
     speex_bits_destroy(&slots.slots[slot]->bits);
-    speex_encoder_destroy(slots.slots[slot]->state);
+    speex_decoder_destroy(slots.slots[slot]->state);
 
     free( slots.slots[slot] );
     slots.slots[slot] = (void*)0;
@@ -94,67 +92,43 @@ JNIEXPORT void JNICALL Java_com_purplefrog_speexjni_SpeexEncoder_deallocate
 
 //
 
-
-JNIEXPORT jint JNICALL Java_com_purplefrog_speexjni_SpeexEncoder_getFrameSize
-  (JNIEnv *env, jclass cls, jint slot)
-{
-    if (throwIfBadSlot(env, slot))
-	return;
-
-    int frame_size;
-    struct Slot * gob = slots.slots[slot];
-
-    speex_encoder_ctl(gob->state, SPEEX_GET_FRAME_SIZE, &frame_size);
-
-    return frame_size;
-}
-
 //
 
-JNIEXPORT jbyteArray JNICALL Java_com_purplefrog_speexjni_SpeexEncoder_encode
-  (JNIEnv *env, jclass cls, jint slot, jshortArray input_frame_)
+JNIEXPORT jshortArray JNICALL Java_com_purplefrog_speexjni_SpeexDecoder_decode
+  (JNIEnv *env, jclass cls, jint slot, jbyteArray input_frame_)
 {
     if (throwIfBadSlot(env, slot))
 	return;
 
     struct Slot * gob = slots.slots[slot];
 
-    int nSamples = (*env)->GetArrayLength(env, input_frame_);
+    int frame_length = (*env)->GetArrayLength(env, input_frame_);
 
     int frame_size;
-    speex_encoder_ctl(gob->state, SPEEX_GET_FRAME_SIZE, &frame_size);
-
-    if (nSamples != frame_size) {
-	throwIllegalArgumentException(env, "mismatch between proper frame size and supplied sample array");
-	return;
-    }
+    speex_decoder_ctl(gob->state, SPEEX_GET_FRAME_SIZE, &frame_size);
 
     //
 
-    short* input_frame = (*env)->GetShortArrayElements(env, input_frame_, 0);
+    char* input_frame = (*env)->GetByteArrayElements(env, input_frame_, 0);
     
-    speex_bits_reset(&gob->bits);
+    speex_bits_read_from(&gob->bits, input_frame, frame_length);
 
-    speex_encode_int(gob->state, input_frame, &gob->bits);
-
-    (*env)->ReleaseShortArrayElements(env, input_frame_, input_frame, 0);
+    (*env)->ReleaseByteArrayElements(env, input_frame_, input_frame, 0);
 
     //
 
-    int nOutput = speex_bits_nbytes(&gob->bits);
-
-    jbyteArray rval;
-    rval = (*env)->NewByteArray(env, nOutput);
+    jshortArray rval;
+    rval = (*env)->NewShortArray(env, frame_size);
     if (rval==0) {
 	throwOutOfMemoryError(env, "failed to allocate speex output frame");
 	return;
     }
 
-    char* output_frame = (*env)->GetByteArrayElements(env, rval, 0);
+    short* output_frame = (*env)->GetShortArrayElements(env, rval, 0);
 
-    speex_bits_write(&gob->bits, output_frame, nOutput);
+    speex_decode_int(gob->state, &gob->bits, output_frame);
 
-    (*env)->ReleaseByteArrayElements(env, rval, output_frame, 0);
+    (*env)->ReleaseShortArrayElements(env, rval, output_frame, 0);
 
     return rval;
 }

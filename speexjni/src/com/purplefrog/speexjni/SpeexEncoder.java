@@ -1,5 +1,9 @@
 package com.purplefrog.speexjni;
 
+/**
+ * Copyright 2012, Robert Forsman
+ * speex-ndk@thoth.purplefrog.com
+ */
 public class SpeexEncoder
 {
     private final int slot;

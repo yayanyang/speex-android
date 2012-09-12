@@ -49,6 +49,8 @@ LOCAL_SRC_FILES :=  \
 ./libspeex/vbr.c \
 ./libspeex/vq.c \
 ./libspeex/window.c \
-./com_purplefrog_speexjni_SpeexEncoder.c
+./com_purplefrog_speexjni_SpeexEncoder.c \
+./com_purplefrog_speexjni_SpeexDecoder.c \
+./slots.c
  
 include $(BUILD_SHARED_LIBRARY)
