@@ -12,6 +12,13 @@ Then
 If anyone happens to know how to rig things so that the ant build
 process does the ndk-build for you, let me know.
 
+To use this speexjni library in an android application, update the
+application's project.properties to include a line like this:
+
+android.library.reference.1=../../ndk-speex/speexjni
+
+And use the com.purplefrog.speexjni.SpeexEncoder and SpeexDecoder objects.
+
 
 http://andrewbrobinson.com/2011/11/28/a-jni-wrapper-for-speex-on-android/
 
