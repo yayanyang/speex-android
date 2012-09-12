@@ -1,0 +1,7 @@
+
+http://andrewbrobinson.com/2011/11/28/a-jni-wrapper-for-speex-on-android/
+
+http://www.speex.org/downloads/
+1.2rc1
+
+javah -d jni/ -classpath bin/classes com.purplefrog.speexjni.SpeexEncoder
