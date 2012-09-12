@@ -5,9 +5,9 @@ $ android update project --path speexjni
 
 Then 
 
-# cd speexjni
-# ant debug
-# ndk-build  # this tool is in your android-ndk-* directory
+$ cd speexjni
+$ ant debug
+$ ndk-build  # this tool is in your android-ndk-* directory
 
 If anyone happens to know how to rig things so that the ant build
 process does the ndk-build for you, let me know.
