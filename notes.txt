@@ -1,7 +1,7 @@
 
 This will probably give you a buildable project:
 
-$ android update project --target 3 --path speexjni
+$ android update lib-project --target 3 --path speexjni
 
 Then 
 
