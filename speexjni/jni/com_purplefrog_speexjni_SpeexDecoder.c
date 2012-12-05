@@ -3,22 +3,27 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "slots.h"
+
+#ifdef SUPPRESS_ANDROID_LOG
+#define LOGD(...) do { } while(0)
+#else
 #include <android/log.h>
 
-#include "slots.h"
+#define LOGD(...)	__android_log_print(ANDROID_LOG_DEBUG  , "libspeex", __VA_ARGS__) 
+#endif
+
 
 static struct SlotVector slots = {
     0,0
 };
-
-#define LOGD(...)	__android_log_print(ANDROID_LOG_DEBUG  , "libspeex", __VA_ARGS__) 
 
 //
 //
 //
 
 JNIEXPORT jint JNICALL Java_com_purplefrog_speexjni_SpeexDecoder_allocate
-  (JNIEnv *env, jclass cls, jboolean wideband)
+  (JNIEnv *env, jclass cls, jint wideband)
 {
     int slot = allocate_slot(&slots);
 
@@ -32,7 +37,21 @@ JNIEXPORT jint JNICALL Java_com_purplefrog_speexjni_SpeexDecoder_allocate
 
     speex_bits_init(&gob->bits);
 
-    gob->state = speex_decoder_init(wideband ? &speex_wb_mode : &speex_nb_mode);
+
+    const SpeexMode * mode;
+    switch (wideband) {
+    case 1:
+	mode = &speex_wb_mode;
+	break;
+    case 2:
+	mode = &speex_uwb_mode;
+	break;
+    default:
+	mode = &speex_nb_mode;
+	break;
+    }
+
+    gob->state = speex_decoder_init(mode);
 
     return slot;
 }

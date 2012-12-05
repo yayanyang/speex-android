@@ -9,9 +9,9 @@ public class SpeexDecoder
 
     private final int slot;
 
-    public SpeexDecoder(boolean wideband)
+    public SpeexDecoder(FrequencyBand band)
     {
-        slot = allocate(wideband);
+        slot = allocate(band.code);
     }
 
     @Override
@@ -33,10 +33,10 @@ public class SpeexDecoder
      * @param wideband true for wideband, false for narrowband
      * @return an index into a slot array in the JNI implementation for our encoder parameters.
      */
-    protected native static int allocate(boolean wideband);
+    protected native static int allocate(int wideband);
 
     /**
-     * @param slot the return value from a previous call to {@link #allocate(boolean)}
+     * @param slot the return value from a previous call to {@link #allocate(int)}
      */
     protected native static void deallocate(int slot);
 

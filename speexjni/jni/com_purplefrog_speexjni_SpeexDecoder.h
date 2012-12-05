@@ -10,18 +10,18 @@ extern "C" {
 /*
  * Class:     com_purplefrog_speexjni_SpeexDecoder
  * Method:    decode
- * Signature: (I[B)[B
+ * Signature: (I[B)[S
  */
-JNIEXPORT jbyteArray JNICALL Java_com_purplefrog_speexjni_SpeexDecoder_decode
+JNIEXPORT jshortArray JNICALL Java_com_purplefrog_speexjni_SpeexDecoder_decode
   (JNIEnv *, jclass, jint, jbyteArray);
 
 /*
  * Class:     com_purplefrog_speexjni_SpeexDecoder
  * Method:    allocate
- * Signature: (Z)I
+ * Signature: (I)I
  */
 JNIEXPORT jint JNICALL Java_com_purplefrog_speexjni_SpeexDecoder_allocate
-  (JNIEnv *, jclass, jboolean);
+  (JNIEnv *, jclass, jint);
 
 /*
  * Class:     com_purplefrog_speexjni_SpeexDecoder

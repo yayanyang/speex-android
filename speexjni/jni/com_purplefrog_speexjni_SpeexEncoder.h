@@ -26,10 +26,10 @@ JNIEXPORT jint JNICALL Java_com_purplefrog_speexjni_SpeexEncoder_getFrameSize
 /*
  * Class:     com_purplefrog_speexjni_SpeexEncoder
  * Method:    allocate
- * Signature: (ZI)I
+ * Signature: (II)I
  */
 JNIEXPORT jint JNICALL Java_com_purplefrog_speexjni_SpeexEncoder_allocate
-  (JNIEnv *, jclass, jboolean, jint);
+  (JNIEnv *, jclass, jint, jint);
 
 /*
  * Class:     com_purplefrog_speexjni_SpeexEncoder
