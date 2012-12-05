@@ -25,6 +25,9 @@ public class XiphCopyrightActivity
         setContentView(R.layout.xiph_copyright);
 
         TextView tv = (TextView) findViewById(R.id.text);
+        if (null==tv) {
+            Log.e(LOG_TAG, "failed to find text widget, brace for exception...");
+        }
         tv.setText(getXiphCopyright());
         tv.setMovementMethod(new ScrollingMovementMethod());
     }
